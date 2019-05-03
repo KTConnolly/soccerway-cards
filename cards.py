@@ -54,11 +54,7 @@ def write_csv(team_name, player_dict):
 
         for player, (mins, cards) in player_dict.items():
             csv_writer.writerow(
-                [
-                    player,
-                    mins,
-                    cards,
-                ]
+                [player, mins, cards]
             )
 
 
