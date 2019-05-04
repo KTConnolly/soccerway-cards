@@ -67,7 +67,7 @@ def available_teams():
     team_names = []
     for team in team_elems:
         if 'italy' in team.a.get('href'):
-            team_names.append(team.a.get('href').split('/')[-3])
+            team_names.append(team.a.get('href').split('/')[3])
     return team_names
 
 
