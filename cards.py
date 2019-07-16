@@ -21,14 +21,14 @@ def mins_played(soup):
     mins_elem = soup.find_all(
         "td", class_="number statistic game-minutes available"
     )
-    return int(mins_elem[-1].text)
+    return mins_elem[-1].text
 
 
 def yellow_cards(soup):
     cards_elem = soup.find_all(
         "td", class_="number statistic yellow-cards available"
     )
-    return int(cards_elem[-1].text)
+    return cards_elem[-1].text
 
 
 def squad(soup):
@@ -36,27 +36,32 @@ def squad(soup):
 
     players_data = [
         (unidecode(player.text), player.a.get("href"))
-        for player in player_elems][:-1]  # Remove coach
+        for player in player_elems]
 
-    return players_data
+    return players_data[:-1]  # Remove coach
 
 
-def card_dict(squad_list):
-    card_data = {}
+def get_players_data(squad_list):
+    card_data = [
+        ["Name", "Mins", "Cards"]
+    ]
+
     for name, url_path in squad_list:
         s = create_soup("https://us.soccerway.com" + url_path)
-        card_data[name] = (mins_played(s), yellow_cards(s))
+        card_data += [
+            [name, mins_played(s), yellow_cards(s)]
+        ]
         print(name)
 
     return card_data
 
 
-def write_csv(team_name, player_dict):
+def write_csv(team_name, players_data):
     with open(f"{team_name}.csv", mode="w", encoding="utf-8", newline="") as f:
         csv_writer = csv.writer(f)
 
-        for player, (mins, cards) in player_dict.items():
-            csv_writer.writerow([player, mins, cards])
+        for player in players_data:
+            csv_writer.writerow(player)
 
 
 def available_teams():
@@ -86,7 +91,8 @@ def main():
 
     s = create_soup(f"https://us.soccerway.com/teams/italy/{args.team}/squad/")
     squad_soup = squad(s)
-    data = card_dict(squad_soup)
+    data = get_players_data(squad_soup)
+    print(data)
     write_csv(args.team, data)
 
 
